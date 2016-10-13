@@ -29,7 +29,6 @@ public class Parser {
 		byte[] modfile = cu.toString().getBytes();
 		Path file = Paths.get("newFile.java");
 		Files.write(file, modfile);
-
 	}
 
 }
