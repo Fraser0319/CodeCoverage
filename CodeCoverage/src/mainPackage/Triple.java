@@ -1,16 +1,20 @@
 package mainPackage;
 
+/**
+ * @author Fraser
+ *
+ */
 public class Triple {
 
 	private String fileName;
-	private int lineNumber;
+	private String  lineNumber;
 	private boolean lineExecuted;
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 
-	public void setLineNumber(int lineNumber) {
+	public void setLineNumber(String  lineNumber) {
 		this.lineNumber = lineNumber;
 	}
 
@@ -22,7 +26,7 @@ public class Triple {
 		return fileName;
 	}
 
-	public int getLineNumber() {
+	public String  getLineNumber() {
 		return lineNumber;
 	}
 
@@ -30,10 +34,15 @@ public class Triple {
 		return lineExecuted;
 	}
 
-	public Triple(String fileName, int lineNumber, boolean lineExecuted) {
+	public Triple(String fileName, String lineNumber, boolean lineExecuted) {
 		this.fileName = fileName;
 		this.lineNumber = lineNumber;
 		this.lineExecuted = lineExecuted;
+	}
+
+	@Override
+	public String toString() {
+		return "fileName: " + fileName + " " + "lineNumber: " + lineNumber + " " + "lineExecuted: " + lineExecuted;
 	}
 
 }
