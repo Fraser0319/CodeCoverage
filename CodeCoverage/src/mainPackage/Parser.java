@@ -68,11 +68,13 @@ public class Parser {
 					block.addStatement(print(s));
 					n.setBody(block);
 					break;
+
 				case "com.github.javaparser.ast.stmt.ReturnStmt":
 					block.addStatement(print(s));
 					block.addStatement(s);
 					n.setBody(block);
 					break;
+
 				case "com.github.javaparser.ast.stmt.IfStmt":
 					IfStmt f = (IfStmt) s;
 					block.addStatement(print(f.getCondition()));
@@ -80,15 +82,18 @@ public class Parser {
 					// System.out.println(Arrays.toString(f.getChildrenNodes().toArray()));
 					// modifyBlockStatement(f.getThenStmt().getChildrenNodes());
 					f = modifyIfStatement(f);
-					
 					block.addStatement(f);
 					n.setBody(block);
 					break;
 
 				case "com.github.javaparser.ast.stmt.ForStmt":
 					ForStmt fs = (ForStmt) s;
+					BlockStmt forBlock = new BlockStmt();
+					forBlock = modifyBlockStatement(fs.getChildrenNodes());
+					System.out.println(Arrays.toString(fs.getChildrenNodes().toArray()));
+					//block.addStatement(forBlock);
 					block.addStatement(fs);
-					System.out.println(fs.getBody());
+					// System.out.println(fs.getBody());
 					n.setBody(block);
 					break;
 
@@ -101,25 +106,40 @@ public class Parser {
 			}
 		}
 
-		public BlockStmt modifyBlockStatement(List<Node> n) {
+		public BlockStmt modifyBlockStatement(List<? extends Node> n) {
 			BlockStmt newBlock = new BlockStmt();
-			BlockStmt thenBlock = (BlockStmt) n.get(1);
+			BlockStmt thenBlock = (BlockStmt) n.get(1); // gets then block from
+														// child node
+			// System.out.println(thenBlock);
 			for (Statement s : thenBlock.getStmts()) {
-				newBlock.addStatement(s);
-				newBlock.addStatement(print(s));
+				switch (s.getClass().getSimpleName()) {
 				
-			}
-			return newBlock;
+				
+				case "IfStmt":
+					IfStmt f = (IfStmt) s;
+					newBlock.addStatement(print(f.getCondition()));  // mark if condition with execute method
+					f = modifyIfStatement(f);
+					newBlock.addStatement(f);
+					newBlock.addStatement(print(f));
+					break;
 
+				}
+				if (!s.getClass().getSimpleName().equals("IfStmt")) {
+					newBlock.addStatement(s);
+					newBlock.addStatement(print(s));
+				}
+			}
+			// System.out.println(newBlock);
+			return newBlock;
 		}
 
 		public IfStmt modifyIfStatement(IfStmt ifStatement) {
 
-			IfStmt copyIfStatement = ifStatement;
-			//modifyBlockStatement(copyIfStatement.getChildrenNodes());
-			copyIfStatement.setThenStmt(modifyBlockStatement(copyIfStatement.getChildrenNodes()));
+			IfStmt modifiedIfStatement = ifStatement;
+			modifiedIfStatement.setThenStmt(modifyBlockStatement(modifiedIfStatement.getChildrenNodes()));
 
-			return copyIfStatement;
+			// System.out.println(modifiedIfStatement);
+			return modifiedIfStatement;
 
 		}
 
@@ -129,9 +149,9 @@ public class Parser {
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
 			newCall.addArgument(new BooleanLiteralExpr(true));
-			//System.out.println(e.getBegin().line);
-			ct.addCode("PracticalTwo", "" + e.getBegin().line);
-			System.out.println(ct.coverageRecord);
+			// System.out.println(e.getBegin().line);
+			// ct.addCode("PracticalTwo", "" + e.getBegin().line);
+			// System.out.println(ct.coverageRecord);
 			return new ExpressionStmt(newCall);
 		}
 
@@ -141,9 +161,9 @@ public class Parser {
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
 			newCall.addArgument(new BooleanLiteralExpr(true));
-			//System.out.println(e.getBegin().line);
-			ct.addCode("PracticalTwo", "" + e.getBegin().line);
-			System.out.println(ct.coverageRecord);
+			// System.out.println(e.getBegin().line);
+			// ct.addCode("PracticalTwo", "" + e.getBegin().line);
+			// System.out.println(ct.coverageRecord);
 			return new ExpressionStmt(newCall);
 		}
 

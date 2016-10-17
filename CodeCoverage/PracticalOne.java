@@ -36,6 +36,12 @@ public class PracticalOne {
 			nextStates.add(input += 'U');
 			input = s;
 		}
+		
+		if(2 == 4){
+			if(2< 4){
+				System.out.println("hello");
+			}
+		}
 
 		// rule 2 - if it starts with M
 		if (s.charAt(0) == 'M') {
