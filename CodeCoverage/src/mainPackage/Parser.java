@@ -5,7 +5,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.github.javaparser.JavaParser;
@@ -13,6 +15,7 @@ import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.BinaryExpr;
+import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -31,7 +34,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 public class Parser {
 
 	public static void main(String[] args) throws Exception {
-		FileInputStream in = new FileInputStream("PracticalTwo.java");
+		FileInputStream in = new FileInputStream("PracticalOne.java");
 
 		CompilationUnit cu;
 		try {
@@ -53,6 +56,8 @@ public class Parser {
 
 	private static class ModifierVisitor extends VoidVisitorAdapter {
 
+		CodeTracker ct = new CodeTracker();
+
 		public void visit(MethodDeclaration n, Object a) {
 			BlockStmt block = new BlockStmt();
 			for (Statement s : n.getBody().getStmts()) {
@@ -71,6 +76,11 @@ public class Parser {
 				case "com.github.javaparser.ast.stmt.IfStmt":
 					IfStmt f = (IfStmt) s;
 					block.addStatement(print(f.getCondition()));
+					BlockStmt b = new BlockStmt();
+					// System.out.println(Arrays.toString(f.getChildrenNodes().toArray()));
+					// modifyBlockStatement(f.getThenStmt().getChildrenNodes());
+					f = modifyIfStatement(f);
+					
 					block.addStatement(f);
 					n.setBody(block);
 					break;
@@ -91,12 +101,37 @@ public class Parser {
 			}
 		}
 
+		public BlockStmt modifyBlockStatement(List<Node> n) {
+			BlockStmt newBlock = new BlockStmt();
+			BlockStmt thenBlock = (BlockStmt) n.get(1);
+			for (Statement s : thenBlock.getStmts()) {
+				newBlock.addStatement(s);
+				newBlock.addStatement(print(s));
+				
+			}
+			return newBlock;
+
+		}
+
+		public IfStmt modifyIfStatement(IfStmt ifStatement) {
+
+			IfStmt copyIfStatement = ifStatement;
+			//modifyBlockStatement(copyIfStatement.getChildrenNodes());
+			copyIfStatement.setThenStmt(modifyBlockStatement(copyIfStatement.getChildrenNodes()));
+
+			return copyIfStatement;
+
+		}
+
 		public Statement print(Statement e) {
 
 			MethodCallExpr newCall = new MethodCallExpr(new NameExpr("mainPackage.CodeTracker"), "markExecuted");
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
-
+			newCall.addArgument(new BooleanLiteralExpr(true));
+			//System.out.println(e.getBegin().line);
+			ct.addCode("PracticalTwo", "" + e.getBegin().line);
+			System.out.println(ct.coverageRecord);
 			return new ExpressionStmt(newCall);
 		}
 
@@ -105,7 +140,10 @@ public class Parser {
 			MethodCallExpr newCall = new MethodCallExpr(new NameExpr("mainPackage.CodeTracker"), "markExecuted");
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
-
+			newCall.addArgument(new BooleanLiteralExpr(true));
+			//System.out.println(e.getBegin().line);
+			ct.addCode("PracticalTwo", "" + e.getBegin().line);
+			System.out.println(ct.coverageRecord);
 			return new ExpressionStmt(newCall);
 		}
 

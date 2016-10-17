@@ -44,7 +44,7 @@ public class PracticalTwo {
 		}
 
 		if (2 == 4) {
-
+			System.out.println("hello");
 		}
 
 		return extendPath;

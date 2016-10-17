@@ -10,15 +10,29 @@ import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
 
 public class CodeTracker {
 
-	static ArrayList<Triple> coverageRecord = new ArrayList<Triple>();
+	ArrayList<Triple> coverageRecord = new ArrayList<Triple>();
 
-	public static void markExecuted(String fileName, String lineNumber) {
+	public void markExecuted(String fileName, String lineNumber) {
+
 		for (Triple t : coverageRecord) {
-			if (t.getFileName() == fileName) {
-				coverageRecord.add(new Triple(fileName, lineNumber, true));
+			if (t.getFileName() == fileName && t.getLineExecuted() == false) {
+				t.setLineExecuted(true);
 			}
 		}
-		coverageRecord.add(new Triple(fileName, lineNumber, true));
 	}
 
+
+	public boolean addCode(String fileName, String lineNumber) {
+		if(coverageRecord.size() == 0){
+			coverageRecord.add(new Triple(fileName, lineNumber, false));
+		}
+		for (Triple t : coverageRecord) {
+			if (coverageRecord.contains(t)) {
+				return false;
+			}
+			coverageRecord.add(new Triple(fileName, lineNumber, false));
+		}
+		//System.out.println(coverageRecord);
+		return true;
+	}
 }
