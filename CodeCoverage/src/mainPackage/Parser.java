@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.hamcrest.core.Is;
+
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -54,9 +56,16 @@ public class Parser {
 		Files.write(file, modfile);
 	}
 
-	private static class ModifierVisitor extends VoidVisitorAdapter {
+	/***
+	 * ***Notes***
+	 * 
+	 * Convert the for each loops to use streams later to clean up the code
+	 * 
+	 * @author fraserbeaton
+	 *
+	 */
 
-		CodeTracker ct = new CodeTracker();
+	private static class ModifierVisitor extends VoidVisitorAdapter {
 
 		public void visit(MethodDeclaration n, Object a) {
 			BlockStmt block = new BlockStmt();
@@ -78,9 +87,6 @@ public class Parser {
 				case "com.github.javaparser.ast.stmt.IfStmt":
 					IfStmt f = (IfStmt) s;
 					block.addStatement(print(f.getCondition()));
-					BlockStmt b = new BlockStmt();
-					// System.out.println(Arrays.toString(f.getChildrenNodes().toArray()));
-					// modifyBlockStatement(f.getThenStmt().getChildrenNodes());
 					f = modifyIfStatement(f);
 					block.addStatement(f);
 					n.setBody(block);
@@ -89,11 +95,7 @@ public class Parser {
 				case "com.github.javaparser.ast.stmt.ForStmt":
 					ForStmt fs = (ForStmt) s;
 					BlockStmt forBlock = new BlockStmt();
-					forBlock = modifyBlockStatement(fs.getChildrenNodes());
-					System.out.println(Arrays.toString(fs.getChildrenNodes().toArray()));
-					//block.addStatement(forBlock);
 					block.addStatement(fs);
-					// System.out.println(fs.getBody());
 					n.setBody(block);
 					break;
 
@@ -107,38 +109,44 @@ public class Parser {
 		}
 
 		public BlockStmt modifyBlockStatement(List<? extends Node> n) {
+
 			BlockStmt newBlock = new BlockStmt();
-			BlockStmt thenBlock = (BlockStmt) n.get(1); // gets then block from
-														// child node
-			// System.out.println(thenBlock);
-			for (Statement s : thenBlock.getStmts()) {
-				switch (s.getClass().getSimpleName()) {
-				
-				
-				case "IfStmt":
+			// BlockStmt thenBlock = (BlockStmt) n.get(1); // gets then block
+			// from
+			List<? extends Node> newList = new ArrayList<>(n);
+
+			// for(Node b : newList){
+			// System.out.println(b.getClass().getSimpleName());
+			// System.out.println(b);
+			// }
+
+			for (Node s : newList) {
+
+				if (s.getClass().getSimpleName().equals("IfStmt")) {
 					IfStmt f = (IfStmt) s;
-					newBlock.addStatement(print(f.getCondition()));  // mark if condition with execute method
+					// newBlock.addStatement(print(f.getCondition()));
+					// System.out.println(f.getThenStmt());
+					// System.out.println(f = modifyIfStatement(f));
+					// System.out.println(f);
 					f = modifyIfStatement(f);
 					newBlock.addStatement(f);
 					newBlock.addStatement(print(f));
-					break;
-
 				}
 				if (!s.getClass().getSimpleName().equals("IfStmt")) {
-					newBlock.addStatement(s);
-					newBlock.addStatement(print(s));
+					newBlock.addStatement((Statement) s);
+					newBlock.addStatement(print((Statement) s));
 				}
 			}
+
 			// System.out.println(newBlock);
 			return newBlock;
+
 		}
 
 		public IfStmt modifyIfStatement(IfStmt ifStatement) {
 
 			IfStmt modifiedIfStatement = ifStatement;
-			modifiedIfStatement.setThenStmt(modifyBlockStatement(modifiedIfStatement.getChildrenNodes()));
-
-			// System.out.println(modifiedIfStatement);
+			modifiedIfStatement.setThenStmt(modifyBlockStatement(modifiedIfStatement.getChildrenNodes().get(1).getChildrenNodes()));
 			return modifiedIfStatement;
 
 		}

@@ -1,4 +1,6 @@
-package Practical1;
+package mainPackage;
+
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,6 +44,7 @@ public class PracticalOne {
 				System.out.println("hello");
 			}
 		}
+		
 
 		// rule 2 - if it starts with M
 		if (s.charAt(0) == 'M') {
