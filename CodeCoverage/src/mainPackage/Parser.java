@@ -95,7 +95,9 @@ public class Parser {
 				case "com.github.javaparser.ast.stmt.ForStmt":
 					ForStmt fs = (ForStmt) s;
 					BlockStmt forBlock = new BlockStmt();
-					block.addStatement(fs);
+					// System.out.println(fs.getChildrenNodes());
+					forBlock = modifyBlockStatement(fs.getChildrenNodes());
+					block.addStatement(forBlock);
 					n.setBody(block);
 					break;
 
@@ -111,42 +113,36 @@ public class Parser {
 		public BlockStmt modifyBlockStatement(List<? extends Node> n) {
 
 			BlockStmt newBlock = new BlockStmt();
-			// BlockStmt thenBlock = (BlockStmt) n.get(1); // gets then block
-			// from
 			List<? extends Node> newList = new ArrayList<>(n);
-
-			// for(Node b : newList){
-			// System.out.println(b.getClass().getSimpleName());
-			// System.out.println(b);
-			// }
-
 			for (Node s : newList) {
-
 				if (s.getClass().getSimpleName().equals("IfStmt")) {
 					IfStmt f = (IfStmt) s;
-					// newBlock.addStatement(print(f.getCondition()));
-					// System.out.println(f.getThenStmt());
-					// System.out.println(f = modifyIfStatement(f));
-					// System.out.println(f);
 					f = modifyIfStatement(f);
 					newBlock.addStatement(f);
 					newBlock.addStatement(print(f));
-				}
-				if (!s.getClass().getSimpleName().equals("IfStmt")) {
-					newBlock.addStatement((Statement) s);
-					newBlock.addStatement(print((Statement) s));
+				} else if (s.getClass().getSimpleName().equals("ForStmt")) {
+					ForStmt fs = (ForStmt) s;
+					newBlock.addStatement(fs.setBody(modifyBlockStatement(fs.getBody().getChildrenNodes())));
+				} else {
+					if (s instanceof Statement) {
+						Statement newStatement = (Statement) s;
+						newBlock.addStatement(newStatement);
+						newBlock.addStatement(print(newStatement));
+					} else {
+						Expression newExpr = (Expression) s;
+						newBlock.addStatement(newExpr);
+						newBlock.addStatement(print(newExpr));
+					}
 				}
 			}
-
-			// System.out.println(newBlock);
 			return newBlock;
-
 		}
 
 		public IfStmt modifyIfStatement(IfStmt ifStatement) {
 
 			IfStmt modifiedIfStatement = ifStatement;
-			modifiedIfStatement.setThenStmt(modifyBlockStatement(modifiedIfStatement.getChildrenNodes().get(1).getChildrenNodes()));
+			modifiedIfStatement.setThenStmt(
+					modifyBlockStatement(modifiedIfStatement.getChildrenNodes().get(1).getChildrenNodes()));
 			return modifiedIfStatement;
 
 		}
@@ -157,9 +153,6 @@ public class Parser {
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
 			newCall.addArgument(new BooleanLiteralExpr(true));
-			// System.out.println(e.getBegin().line);
-			// ct.addCode("PracticalTwo", "" + e.getBegin().line);
-			// System.out.println(ct.coverageRecord);
 			return new ExpressionStmt(newCall);
 		}
 
@@ -169,12 +162,7 @@ public class Parser {
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
 			newCall.addArgument(new BooleanLiteralExpr(true));
-			// System.out.println(e.getBegin().line);
-			// ct.addCode("PracticalTwo", "" + e.getBegin().line);
-			// System.out.println(ct.coverageRecord);
 			return new ExpressionStmt(newCall);
 		}
-
 	}
-
 }
