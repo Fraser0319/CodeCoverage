@@ -1,6 +1,7 @@
 package mainPackage;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import com.github.javaparser.ast.Node;
 import com.github.javaparser.ast.body.MethodDeclaration;
@@ -10,9 +11,13 @@ import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
 
 public class CodeTracker {
 
-	ArrayList<Triple> coverageRecord = new ArrayList<Triple>();
+	private static List<Triple> coverageRecord = new ArrayList<Triple>();
 
-	public void markExecuted(String fileName, String lineNumber) {
+	public static List<Triple> getCoverageRecord() {
+		return coverageRecord;
+	}
+
+	public static void markExecuted(String fileName, String lineNumber) {
 
 		for (Triple t : coverageRecord) {
 			if (t.getFileName() == fileName && t.getLineExecuted() == false) {
@@ -21,18 +26,12 @@ public class CodeTracker {
 		}
 	}
 
-
-	public boolean addCode(String fileName, String lineNumber) {
-		if(coverageRecord.size() == 0){
+	public static void addCode(String fileName, String lineNumber) {
+		//System.out.println(coverageRecord.size());
+		if (coverageRecord.size() == 0) {
+			coverageRecord.add(new Triple(fileName, lineNumber, false));
+		}else{
 			coverageRecord.add(new Triple(fileName, lineNumber, false));
 		}
-		for (Triple t : coverageRecord) {
-			if (coverageRecord.contains(t)) {
-				return false;
-			}
-			coverageRecord.add(new Triple(fileName, lineNumber, false));
-		}
-		//System.out.println(coverageRecord);
-		return true;
 	}
 }

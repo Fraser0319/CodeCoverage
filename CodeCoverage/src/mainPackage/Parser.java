@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.hamcrest.core.Is;
-
+import mainPackage.CodeTracker;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
@@ -36,7 +36,7 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 public class Parser {
 
 	public static void main(String[] args) throws Exception {
-		FileInputStream in = new FileInputStream("PracticalOne.java");
+		FileInputStream in = new FileInputStream("PracticalTwo.java");
 
 		CompilationUnit cu;
 		try {
@@ -50,6 +50,7 @@ public class Parser {
 		// write the modified cu back...
 		// System.out.println(cu.toString());
 
+		System.out.println(CodeTracker.getCoverageRecord());
 		// Write modified AST to a file
 		byte[] modfile = cu.toString().getBytes();
 		Path file = Paths.get("newFile.java");
@@ -86,23 +87,23 @@ public class Parser {
 
 				case "com.github.javaparser.ast.stmt.IfStmt":
 					IfStmt f = (IfStmt) s;
-					block.addStatement(print(f.getCondition()));
 					f = modifyIfStatement(f);
 					block.addStatement(f);
+					block.addStatement(print(f));
 					n.setBody(block);
 					break;
 
 				case "com.github.javaparser.ast.stmt.ForStmt":
 					ForStmt fs = (ForStmt) s;
-					BlockStmt forBlock = new BlockStmt();
-					// System.out.println(fs.getChildrenNodes());
-					forBlock = modifyBlockStatement(fs.getChildrenNodes());
-					block.addStatement(forBlock);
+					fs = modifForStatement(fs);
+					block.addStatement(fs);
+					block.addStatement(print(fs));
 					n.setBody(block);
 					break;
 
 				case "com.github.javaparser.ast.stmt.WhileStmt":
 					WhileStmt ws = (WhileStmt) s;
+					// System.out.println(ws.getBody());
 					block.addStatement(ws);
 					n.setBody(block);
 					break;
@@ -122,7 +123,13 @@ public class Parser {
 					newBlock.addStatement(print(f));
 				} else if (s.getClass().getSimpleName().equals("ForStmt")) {
 					ForStmt fs = (ForStmt) s;
-					newBlock.addStatement(fs.setBody(modifyBlockStatement(fs.getBody().getChildrenNodes())));
+					fs = modifForStatement(fs);
+					newBlock.addStatement(fs);
+					newBlock.addStatement(print(fs));
+					//newBlock.addStatement(fs.setBody(modifyBlockStatement(fs.getBody().getChildrenNodes())));
+
+				} else if (s.getClass().getSimpleName().equals("WhileStmt")) {
+					WhileStmt ws = (WhileStmt) s;
 				} else {
 					if (s instanceof Statement) {
 						Statement newStatement = (Statement) s;
@@ -147,12 +154,21 @@ public class Parser {
 
 		}
 
+		public ForStmt modifForStatement(ForStmt forStatement) {
+			ForStmt modifiedForStatement = forStatement;
+			modifiedForStatement
+					.setBody(modifyBlockStatement(modifiedForStatement.getChildrenNodes().get(3).getChildrenNodes()));
+			return modifiedForStatement;
+		}
+
 		public Statement print(Statement e) {
 
 			MethodCallExpr newCall = new MethodCallExpr(new NameExpr("mainPackage.CodeTracker"), "markExecuted");
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
-			newCall.addArgument(new BooleanLiteralExpr(true));
+			// newCall.addArgument(new BooleanLiteralExpr(true));
+			CodeTracker.addCode("PracticalTwo", "" + e.getBegin().line);
+			// System.out.println(CodeTracker.getCoverageRecord());
 			return new ExpressionStmt(newCall);
 		}
 
@@ -161,7 +177,9 @@ public class Parser {
 			MethodCallExpr newCall = new MethodCallExpr(new NameExpr("mainPackage.CodeTracker"), "markExecuted");
 			newCall.addArgument(new StringLiteralExpr("PracticalTwo"));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
-			newCall.addArgument(new BooleanLiteralExpr(true));
+			// newCall.addArgument(new BooleanLiteralExpr(true));
+			CodeTracker.addCode("PracticalTwo", "" + e.getBegin().line);
+			// System.out.println(CodeTracker.getCoverageRecord());
 			return new ExpressionStmt(newCall);
 		}
 	}
