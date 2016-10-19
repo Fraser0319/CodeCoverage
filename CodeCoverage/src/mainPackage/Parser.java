@@ -28,6 +28,7 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
 import com.github.javaparser.ast.stmt.Statement;
+import com.github.javaparser.ast.stmt.SwitchEntryStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
@@ -72,20 +73,20 @@ public class Parser {
 			BlockStmt block = new BlockStmt();
 			for (Statement s : n.getBody().getStmts()) {
 
-				switch (s.getClass().getName()) {
-				case "com.github.javaparser.ast.stmt.ExpressionStmt":
+				switch (s.getClass().getSimpleName()) {
+				case "ExpressionStmt":
 					block.addStatement(s);
 					block.addStatement(print(s));
 					n.setBody(block);
 					break;
 
-				case "com.github.javaparser.ast.stmt.ReturnStmt":
+				case "ReturnStmt":
 					block.addStatement(print(s));
 					block.addStatement(s);
 					n.setBody(block);
 					break;
 
-				case "com.github.javaparser.ast.stmt.IfStmt":
+				case "IfStmt":
 					IfStmt f = (IfStmt) s;
 					f = modifyIfStatement(f);
 					block.addStatement(f);
@@ -93,25 +94,34 @@ public class Parser {
 					n.setBody(block);
 					break;
 
-				case "com.github.javaparser.ast.stmt.ForStmt":
+				case "ForStmt":
 					ForStmt fs = (ForStmt) s;
-					fs = modifForStatement(fs);
+					fs = modifyForStatement(fs);
 					block.addStatement(fs);
 					block.addStatement(print(fs));
 					n.setBody(block);
 					break;
 
-				case "com.github.javaparser.ast.stmt.WhileStmt":
+				case "WhileStmt":
 					WhileStmt ws = (WhileStmt) s;
-					ws = modifiedWhileStatement(ws);
+					ws = modifyWhileStatement(ws);
 					block.addStatement(ws);
 					block.addStatement(print(ws));
 					n.setBody(block);
 					break;
+				case "SwitchStmt":
+					SwitchStmt sws = (SwitchStmt) s;
+					sws = modifiedSwitchStatement(sws);
+					block.addStatement(sws);
+					block.addStatement(print(sws));
+					n.setBody(block);
+					break;
+				// System.out.println(sws.getEntries().getClass().getSimpleName());
 				}
 			}
 		}
 
+		// works with List<Node> also.
 		public BlockStmt modifyBlockStatement(List<? extends Node> n) {
 
 			BlockStmt newBlock = new BlockStmt();
@@ -124,12 +134,12 @@ public class Parser {
 					newBlock.addStatement(print(f));
 				} else if (s.getClass().getSimpleName().equals("ForStmt")) {
 					ForStmt fs = (ForStmt) s;
-					fs = modifForStatement(fs);
+					fs = modifyForStatement(fs);
 					newBlock.addStatement(fs);
 					newBlock.addStatement(print(fs));
 				} else if (s.getClass().getSimpleName().equals("WhileStmt")) {
 					WhileStmt ws = (WhileStmt) s;
-					ws = modifiedWhileStatement(ws);
+					ws = modifyWhileStatement(ws);
 					newBlock.addStatement(ws);
 					newBlock.addStatement(print(ws));
 				} else {
@@ -149,29 +159,49 @@ public class Parser {
 
 		public IfStmt modifyIfStatement(IfStmt ifStatement) {
 			IfStmt modifiedIfStatement = ifStatement;
-			modifiedIfStatement.setThenStmt(
-					modifyBlockStatement(modifiedIfStatement.getChildrenNodes().get(1).getChildrenNodes()));
-			if(modifiedIfStatement.getElseStmt() != null){
-//				System.out.println(modifiedIfStatement.getElseStmt().getBegin().line);
-				//System.out.println(modifiedIfStatement.getElseStmt().getChildrenNodes());
+			modifiedIfStatement.setThenStmt(modifyBlockStatement(modifiedIfStatement.getChildrenNodes().get(1).getChildrenNodes()));
+			if (modifiedIfStatement.getElseStmt() != null) {
 				modifiedIfStatement.setElseStmt(modifyBlockStatement(modifiedIfStatement.getElseStmt().getChildrenNodes()));
 			}
 			return modifiedIfStatement;
 		}
 
-		public ForStmt modifForStatement(ForStmt forStatement) {
+		public ForStmt modifyForStatement(ForStmt forStatement) {
 			ForStmt modifiedForStatement = forStatement;
-			modifiedForStatement
-					.setBody(modifyBlockStatement(modifiedForStatement.getChildrenNodes().get(3).getChildrenNodes()));
+			modifiedForStatement.setBody(modifyBlockStatement(modifiedForStatement.getChildrenNodes().get(3).getChildrenNodes()));
 			return modifiedForStatement;
 		}
 
-		public WhileStmt modifiedWhileStatement(WhileStmt whileStatement) {
+		public WhileStmt modifyWhileStatement(WhileStmt whileStatement) {
 			WhileStmt modifiedWhileStatement = whileStatement;
-			//System.out.println(modifiedWhileStatement.getChildrenNodes().get(1).getChildrenNodes());
-			modifiedWhileStatement
-					.setBody(modifyBlockStatement(modifiedWhileStatement.getChildrenNodes().get(1).getChildrenNodes()));
+			modifiedWhileStatement.setBody(modifyBlockStatement(modifiedWhileStatement.getChildrenNodes().get(1).getChildrenNodes()));
 			return modifiedWhileStatement;
+		}
+
+		public SwitchStmt modifiedSwitchStatement(SwitchStmt switchStatement) {
+			SwitchStmt modifiedSwitchStatement = switchStatement;
+			modifiedSwitchStatement.setEntries(modifySwitchEntryStatement((modifiedSwitchStatement.getChildrenNodes())));
+			return modifiedSwitchStatement;
+		}
+
+		public List<SwitchEntryStmt> modifySwitchEntryStatement(List<Node> n) {
+			SwitchEntryStmt modifiedSwitchEntry = null;
+			List<SwitchEntryStmt> newEntryList = new ArrayList<>();
+			List<Node> nodeList = new ArrayList<>(n);
+			for (Node s : nodeList) {
+				if (s.getClass().getSimpleName().equals("SwitchEntryStmt")) {
+					SwitchEntryStmt sw = (SwitchEntryStmt) s;
+					System.out.println(sw);
+					modifiedSwitchEntry = new SwitchEntryStmt();
+					modifiedSwitchEntry.setLabel(sw.getLabel());
+					for (Statement statement : sw.getStmts()) {
+						modifiedSwitchEntry.addStatement(print(statement));
+						modifiedSwitchEntry.addStatement(statement);
+					}
+					newEntryList.add(modifiedSwitchEntry);
+				}
+			}
+			return newEntryList;
 		}
 
 		public Statement print(Statement e) {
