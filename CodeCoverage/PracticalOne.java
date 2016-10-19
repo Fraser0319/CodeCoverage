@@ -85,7 +85,7 @@ public class PracticalOne {
 
 				checkedString = input.substring(0, i);
 				subString = input.substring(i);
-
+				
 				if (subString.contains("UU")) {
 					String updatedSequence = checkedString + subString.replaceFirst("UU", "");
 					if (!nextStates.contains(updatedSequence))
