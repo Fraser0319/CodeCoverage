@@ -103,8 +103,9 @@ public class Parser {
 
 				case "com.github.javaparser.ast.stmt.WhileStmt":
 					WhileStmt ws = (WhileStmt) s;
-					// System.out.println(ws.getBody());
+					ws = modifiedWhileStatement(ws);
 					block.addStatement(ws);
+					block.addStatement(print(ws));
 					n.setBody(block);
 					break;
 				}
@@ -126,10 +127,11 @@ public class Parser {
 					fs = modifForStatement(fs);
 					newBlock.addStatement(fs);
 					newBlock.addStatement(print(fs));
-					//newBlock.addStatement(fs.setBody(modifyBlockStatement(fs.getBody().getChildrenNodes())));
-
 				} else if (s.getClass().getSimpleName().equals("WhileStmt")) {
 					WhileStmt ws = (WhileStmt) s;
+					ws = modifiedWhileStatement(ws);
+					newBlock.addStatement(ws);
+					newBlock.addStatement(print(ws));
 				} else {
 					if (s instanceof Statement) {
 						Statement newStatement = (Statement) s;
@@ -146,12 +148,15 @@ public class Parser {
 		}
 
 		public IfStmt modifyIfStatement(IfStmt ifStatement) {
-
 			IfStmt modifiedIfStatement = ifStatement;
 			modifiedIfStatement.setThenStmt(
 					modifyBlockStatement(modifiedIfStatement.getChildrenNodes().get(1).getChildrenNodes()));
+			if(modifiedIfStatement.getElseStmt() != null){
+//				System.out.println(modifiedIfStatement.getElseStmt().getBegin().line);
+				//System.out.println(modifiedIfStatement.getElseStmt().getChildrenNodes());
+				modifiedIfStatement.setElseStmt(modifyBlockStatement(modifiedIfStatement.getElseStmt().getChildrenNodes()));
+			}
 			return modifiedIfStatement;
-
 		}
 
 		public ForStmt modifForStatement(ForStmt forStatement) {
@@ -159,6 +164,14 @@ public class Parser {
 			modifiedForStatement
 					.setBody(modifyBlockStatement(modifiedForStatement.getChildrenNodes().get(3).getChildrenNodes()));
 			return modifiedForStatement;
+		}
+
+		public WhileStmt modifiedWhileStatement(WhileStmt whileStatement) {
+			WhileStmt modifiedWhileStatement = whileStatement;
+			//System.out.println(modifiedWhileStatement.getChildrenNodes().get(1).getChildrenNodes());
+			modifiedWhileStatement
+					.setBody(modifyBlockStatement(modifiedWhileStatement.getChildrenNodes().get(1).getChildrenNodes()));
+			return modifiedWhileStatement;
 		}
 
 		public Statement print(Statement e) {
