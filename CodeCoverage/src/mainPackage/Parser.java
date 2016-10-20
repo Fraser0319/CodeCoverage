@@ -1,25 +1,23 @@
 package mainPackage;
 
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import org.hamcrest.core.Is;
 import mainPackage.CodeTracker;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
-import com.github.javaparser.ast.body.MethodDeclaration;
-import com.github.javaparser.ast.expr.BinaryExpr;
-import com.github.javaparser.ast.expr.BooleanLiteralExpr;
 import com.github.javaparser.ast.expr.Expression;
-import com.github.javaparser.ast.expr.IntegerLiteralExpr;
 import com.github.javaparser.ast.expr.MethodCallExpr;
 import com.github.javaparser.ast.expr.NameExpr;
 import com.github.javaparser.ast.expr.StringLiteralExpr;
@@ -28,131 +26,136 @@ import com.github.javaparser.ast.stmt.ExpressionStmt;
 import com.github.javaparser.ast.stmt.ForStmt;
 import com.github.javaparser.ast.stmt.ForeachStmt;
 import com.github.javaparser.ast.stmt.IfStmt;
-import com.github.javaparser.ast.stmt.ReturnStmt;
 import com.github.javaparser.ast.stmt.Statement;
 import com.github.javaparser.ast.stmt.SwitchEntryStmt;
 import com.github.javaparser.ast.stmt.SwitchStmt;
 import com.github.javaparser.ast.stmt.WhileStmt;
-import com.github.javaparser.ast.visitor.ModifierVisitorAdapter;
+
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 public class Parser {
 
 	public static void main(String[] args) throws Exception {
 		FileInputStream in = new FileInputStream("PracticalOne.java");
-
 		CompilationUnit cu;
+		Parser p = new Parser();
+		
+		
+		System.out.println(CodeTracker.getCoverageRecord());
 		try {
+			
 			cu = JavaParser.parse(in);
 		} finally {
 			in.close();
 		}
 		new ModifierVisitor().visit(cu, null);
 		
+		
+		
 		byte[] modfile = cu.toString().getBytes();
-		Path file = Paths.get("newFile.java");
+		Path file = Paths.get("src/mainPackage/PracticalOne.java");
 		Files.write(file, modfile);
+		p.serialise();
 	}
-
+	
+	public void serialise() throws IOException{
+		FileOutputStream writeOut = new FileOutputStream("codeTracker.ser");
+		ObjectOutputStream out = new ObjectOutputStream(writeOut);
+		out.writeObject(CodeTracker.getCoverageRecord());
+		out.close();
+		writeOut.close();
+		System.out.println("list saved in codeTracker.ser");
+	}
+	
+	public void deserialise() throws IOException, ClassNotFoundException{
+		FileInputStream fileIn = new FileInputStream("codeTracker.ser");
+		ObjectInputStream in = new ObjectInputStream(fileIn);
+		CodeTracker.setCoverageRecord((List<Triple>) in.readObject());
+		fileIn.close();
+	}
+	
 	private static class ModifierVisitor extends VoidVisitorAdapter {
-
-		public void visit(IfStmt n, Object a){			
+		
+		public void visit(IfStmt n, Object a) {
 			n = modifyIf(n);
 		}
-		
-		public void visit(ForStmt n, Object a){	
+
+		public void visit(ForStmt n, Object a) {
 			n = modifyForLoop(n);
 		}
-		
-		public void visit(WhileStmt n, Object a){
+
+		public void visit(WhileStmt n, Object a) {
 			n = modifyWhile(n);
 		}
-		
-		public void visit(ReturnStmt n, Object a){
-			BlockStmt b = new BlockStmt();
-			b = (BlockStmt) n.getParentNode();
-			b.addStatement(n);
-			b.addStatement(print(n));
-			//print(n);
-		}
-		
-		public void visit(ExpressionStmt n, Object a){
-			print(n);
-		}
-		
-		public void visit(SwitchStmt n, Object a){
+
+		public void visit(SwitchStmt n, Object a) {
 			n = modifiedSwitch(n);
 		}
-		
-		public void visit(ForeachStmt n, Object a){
+
+		public void visit(ForeachStmt n, Object a) {
 			n = modifyForEach(n);
 		}
-		
-		
-		
-		
-//		public void visit(MethodDeclaration n, Object a) {
-//			BlockStmt block = new BlockStmt();
-//			for (Statement s : n.getBody().getStmts()) {
-//
-//				switch (s.getClass().getSimpleName()) {
-//				case "ExpressionStmt":
-//					block.addStatement(s);
-//					block.addStatement(print(s));
-//					n.setBody(block);
-//					break;
-//
-//				case "ReturnStmt":
-//					block.addStatement(print(s));
-//					block.addStatement(s);
-//					n.setBody(block);
-//					break;
-//
-//				case "IfStmt":
-//					IfStmt f = (IfStmt) s;
-//					f = modifyIf(f);
-//					block.addStatement(f);
-//					block.addStatement(print(f));
-//					n.setBody(block);
-//					break;
-//
-//				case "ForStmt":
-//					ForStmt fs = (ForStmt) s;
-//					fs = modifyForLoop(fs);
-//					block.addStatement(fs);
-//					block.addStatement(print(fs));
-//					n.setBody(block);
-//					break;
-//
-//				case "WhileStmt":
-//					WhileStmt ws = (WhileStmt) s;
-//					ws = modifyWhile(ws);
-//					block.addStatement(ws);
-//					block.addStatement(print(ws));
-//					n.setBody(block);
-//					break;
-//
-//				case "SwitchStmt":
-//					SwitchStmt sws = (SwitchStmt) s;
-//					sws = modifiedSwitch(sws);
-//					block.addStatement(sws);
-//					block.addStatement(print(sws));
-//					n.setBody(block);
-//					break;
-//
-//				case "ForeachStmt":
-//					ForeachStmt fes = (ForeachStmt) s;
-//					fes = modifyForEach(fes);
-//					block.addStatement(fes);
-//					block.addStatement(print(fes));
-//					n.setBody(block);
-//					break;
-//				}
-//			}
-//		}
-		
-		
-		
+
+		// public void visit(MethodDeclaration n, Object a) {
+		// BlockStmt block = new BlockStmt();
+		// for (Statement s : n.getBody().getStmts()) {
+		//
+		// switch (s.getClass().getSimpleName()) {
+		// case "ExpressionStmt":
+		// block.addStatement(s);
+		// block.addStatement(print(s));
+		// n.setBody(block);
+		// break;
+		//
+		// case "ReturnStmt":
+		// block.addStatement(print(s));
+		// block.addStatement(s);
+		// n.setBody(block);
+		// break;
+		//
+		// case "IfStmt":
+		// IfStmt f = (IfStmt) s;
+		// f = modifyIf(f);
+		// block.addStatement(f);
+		// block.addStatement(print(f));
+		// n.setBody(block);
+		// break;
+		//
+		// case "ForStmt":
+		// ForStmt fs = (ForStmt) s;
+		// fs = modifyForLoop(fs);
+		// block.addStatement(fs);
+		// block.addStatement(print(fs));
+		// n.setBody(block);
+		// break;
+		//
+		// case "WhileStmt":
+		// WhileStmt ws = (WhileStmt) s;
+		// ws = modifyWhile(ws);
+		// block.addStatement(ws);
+		// block.addStatement(print(ws));
+		// n.setBody(block);
+		// break;
+		//
+		// case "SwitchStmt":
+		// SwitchStmt sws = (SwitchStmt) s;
+		// sws = modifiedSwitch(sws);
+		// block.addStatement(sws);
+		// block.addStatement(print(sws));
+		// n.setBody(block);
+		// break;
+		//
+		// case "ForeachStmt":
+		// ForeachStmt fes = (ForeachStmt) s;
+		// fes = modifyForEach(fes);
+		// block.addStatement(fes);
+		// block.addStatement(print(fes));
+		// n.setBody(block);
+		// break;
+		// }
+		// }
+		// }
+
 		// works with List<Node> also.
 		public BlockStmt modifyBlockStatement(List<? extends Node> n) {
 
@@ -174,12 +177,12 @@ public class Parser {
 					ws = modifyWhile(ws);
 					newBlock.addStatement(ws);
 					newBlock.addStatement(print(ws));
-				} else if(s.getClass().getSimpleName().equals("SwitchStmt")){
+				} else if (s.getClass().getSimpleName().equals("SwitchStmt")) {
 					SwitchStmt sws = (SwitchStmt) s;
 					sws = modifiedSwitch(sws);
 					newBlock.addStatement(sws);
 					newBlock.addStatement(print(sws));
-				} else if(s.getClass().getSimpleName().equals("ForeachStmt")){
+				} else if (s.getClass().getSimpleName().equals("ForeachStmt")) {
 					ForeachStmt fes = (ForeachStmt) s;
 					fes = modifyForEach(fes);
 					newBlock.addStatement(fes);
@@ -256,6 +259,9 @@ public class Parser {
 			modifiedForech.setBody(modifyBlockStatement(modifiedForech.getChildrenNodes().get(2).getChildrenNodes()));
 			return modifiedForech;
 		}
+		
+		
+
 
 		public Statement print(Statement e) {
 

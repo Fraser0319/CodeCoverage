@@ -1,10 +1,12 @@
 package mainPackage;
 
+import java.io.Serializable;
+
 /**
  * @author Fraser
  *
  */
-public class Triple {
+public class Triple implements Serializable {
 
 	private String fileName;
 	private String  lineNumber;
