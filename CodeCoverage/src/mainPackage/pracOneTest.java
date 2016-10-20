@@ -7,22 +7,37 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Before;
 import org.junit.Test;
 
 public class pracOneTest {
 
+	@Before
+	public void init(){
+		CodeTracker.start();
+	}
+	
+	
 	@Test
-	public void test() throws ClassNotFoundException, IOException {
-		PracticalOne p1 = new PracticalOne();
-		List<String> temp = new ArrayList<String>();
+	public void test(){
+//		PracticalOne p1 = new PracticalOne();
+//		List<String> temp = new ArrayList<String>();
+//		
+//		temp.add("MIIIIUIIIIUIIIIUIIIIU");
+//		temp.add("MUIUIIIIU");
+//		temp.add("MIUUIIIIU");
+//		temp.add("MIIIIUUIU");
+//		temp.add("MIIIIUIUU");
+//		System.out.println(temp);
+//		assertFalse(p1.nextstates("MIIIIUIIIIU") == temp);
 		
-		temp.add("MIIIIUIIIIUIIIIUIIIIU");
-		temp.add("MUIUIIIIU");
-		temp.add("MIUUIIIIU");
-		temp.add("MIIIIUUIU");
-		temp.add("MIIIIUIUU");
-		System.out.println(temp);
-		assertFalse(p1.nextstates("MIIIIUIIIIU") == temp);
+		
+		PracticalTwo p2 = new PracticalTwo();
+        // System.out.println(p2.extendPath(path));
+        // System.out.println(p2.breadthFirstSearch("MUIUUIU"));
+        // System.out.println(p2.depthLimitedDFS("MUIUUIU",5));
+        p2.iterativeDeepening("MUIUUIU");
+		
 	}
 
 }

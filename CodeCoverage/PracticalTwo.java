@@ -1,4 +1,4 @@
-package Practical2;
+package mainPackage;
 
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -8,12 +8,12 @@ import java.util.Stack;
 
 import javax.print.attribute.Size2DSyntax;
 
-import Practical1.PracticalOne;
+import mainPackage.PracticalOne;
 
 public class PracticalTwo {
 
 	public static void main(String[] args) {
-
+		
 		List<String> path = new ArrayList<String>();
 		path.add("MI");
 		path.add("MII");
@@ -37,7 +37,7 @@ public class PracticalTwo {
 		switch(list.iterator().next()){
 		case 1:
 			System.out.println("1");
-			p1.nextStates();
+			//p1.nextStates();
 			System.out.println("3");
 			break;
 			
