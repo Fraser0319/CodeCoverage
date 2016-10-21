@@ -12,92 +12,88 @@ public class PracticalOne {
     }
 
     public static void main(String[] args) {
-    	
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "19");
         PracticalOne p1 = new PracticalOne();
-        // Step 1 - create a new node
-        // (Various options)
-        // NameExpr systemOut = NameExpr.name("System.out");
-        // MethodCallExpr call = new MethodCallExpr(systemOut, "println");
-        // MethodCallExpr call = new MethodCallExpr(NameExpr.name("System.out"), "println");
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "23");
         System.out.println(p1.nextstates("MIIIIUIIIIU"));
     }
 
     public List<String> nextstates(String s) {
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "28");
         String input;
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "29");
         input = s;
         // rule 1 - if it ends in an I
         if (s.charAt(s.length() - 1) == 'I') {
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "34");
             nextStates.add(input += 'U');
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "38");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "35");
             input = s;
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "39");
         }
-        if (2 == 4) {
-            if (2 < 4) {
-                System.out.println("hello");
-                mainPackage.CodeTracker.markExecuted("PracticalOne", "44");
-            }
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "43");
-        }
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "32");
         // rule 2 - if it starts with M
         if (s.charAt(0) == 'M') {
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "43");
             String doubleString = input.substring(1, input.length());
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "52");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "45");
             nextStates.add(input += doubleString);
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "54");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "46");
             input = s;
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "55");
         }
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "41");
         // rule 3 if the string contains III replace with U
         if (s.contains("III")) {
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "52");
             String subString = "";
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "61");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "53");
             String checkedString = "";
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "62");
             for (int i = 1; i < input.length(); i++) {
+                mainPackage.CodeTracker.markExecuted("PracticalOne", "57");
                 checkedString = input.substring(0, i);
-                mainPackage.CodeTracker.markExecuted("PracticalOne", "66");
+                mainPackage.CodeTracker.markExecuted("PracticalOne", "58");
                 subString = input.substring(i);
-                mainPackage.CodeTracker.markExecuted("PracticalOne", "67");
                 if (subString.contains("III")) {
+                    mainPackage.CodeTracker.markExecuted("PracticalOne", "61");
                     String updatedSequence = (checkedString + subString.replaceFirst("III", "U"));
-                    mainPackage.CodeTracker.markExecuted("PracticalOne", "70");
                     if (!nextStates.contains(updatedSequence)) {
                         nextStates.add(checkedString + subString.replaceFirst("III", "U"));
-                        mainPackage.CodeTracker.markExecuted("PracticalOne", "72");
+                        mainPackage.CodeTracker.markExecuted("PracticalOne", "63");
                     }
-                    mainPackage.CodeTracker.markExecuted("PracticalOne", "71");
+                    mainPackage.CodeTracker.markExecuted("PracticalOne", "62");
                 }
-                mainPackage.CodeTracker.markExecuted("PracticalOne", "69");
+                mainPackage.CodeTracker.markExecuted("PracticalOne", "60");
             }
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "64");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "55");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "66");
             input = s;
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "75");
         }
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "50");
         // rule4 - if the string contains UU replace it with ""
         if (s.contains("UU")) {
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "72");
             String subString = "";
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "81");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "73");
             String checkedString = "";
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "82");
             for (int i = 1; i < input.length(); i++) {
+                mainPackage.CodeTracker.markExecuted("PracticalOne", "77");
                 checkedString = input.substring(0, i);
-                mainPackage.CodeTracker.markExecuted("PracticalOne", "86");
+                mainPackage.CodeTracker.markExecuted("PracticalOne", "78");
                 subString = input.substring(i);
-                mainPackage.CodeTracker.markExecuted("PracticalOne", "87");
                 if (subString.contains("UU")) {
+                    mainPackage.CodeTracker.markExecuted("PracticalOne", "81");
                     String updatedSequence = checkedString + subString.replaceFirst("UU", "");
-                    mainPackage.CodeTracker.markExecuted("PracticalOne", "90");
                     if (!nextStates.contains(updatedSequence)) {
                         nextStates.add(updatedSequence);
-                        mainPackage.CodeTracker.markExecuted("PracticalOne", "92");
+                        mainPackage.CodeTracker.markExecuted("PracticalOne", "83");
                     }
-                    mainPackage.CodeTracker.markExecuted("PracticalOne", "91");
+                    mainPackage.CodeTracker.markExecuted("PracticalOne", "82");
                 }
-                mainPackage.CodeTracker.markExecuted("PracticalOne", "89");
+                mainPackage.CodeTracker.markExecuted("PracticalOne", "80");
             }
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "84");
+            mainPackage.CodeTracker.markExecuted("PracticalOne", "75");
         }
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "70");
+        mainPackage.CodeTracker.markExecuted("PracticalOne", "88");
         return nextStates;
     }
 }

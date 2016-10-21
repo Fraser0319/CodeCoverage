@@ -6,7 +6,7 @@ import java.io.Serializable;
  * @author Fraser
  *
  */
-public class Triple implements Serializable {
+public class Line implements Serializable {
 
 	private String fileName;
 	private String  lineNumber;
@@ -36,7 +36,7 @@ public class Triple implements Serializable {
 		return lineExecuted;
 	}
 
-	public Triple(String fileName, String lineNumber, boolean lineExecuted) {
+	public Line(String fileName, String lineNumber, boolean lineExecuted) {
 		this.fileName = fileName;
 		this.lineNumber = lineNumber;
 		this.lineExecuted = lineExecuted;

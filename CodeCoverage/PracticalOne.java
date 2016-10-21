@@ -18,11 +18,7 @@ public class PracticalOne {
 
 		PracticalOne p1 = new PracticalOne();
 		
-		// Step 1 - create a new node
-    	// (Various options)
-        // NameExpr systemOut = NameExpr.name("System.out");
-        // MethodCallExpr call = new MethodCallExpr(systemOut, "println");
-        // MethodCallExpr call = new MethodCallExpr(NameExpr.name("System.out"), "println");
+
 		
 		System.out.println(p1.nextstates("MIIIIUIIIIU"));
 	}
@@ -39,13 +35,8 @@ public class PracticalOne {
 			input = s;
 		}
 		
-		if(2 == 4){
-			if(2< 4){
-				System.out.println("hello");
-			}
-		}
-		
 
+	
 		// rule 2 - if it starts with M
 		if (s.charAt(0) == 'M') {
 

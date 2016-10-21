@@ -30,22 +30,6 @@ public class PracticalTwo {
 	public List<List<String>> extendPath(List<String> path) {
 		PracticalOne p1 = new PracticalOne();
 		
-		List<Integer> list = new ArrayList<Integer>();
-		list.add(1);
-		list.add(2);
-		
-		switch(list.iterator().next()){
-		case 1:
-			System.out.println("1");
-			//p1.nextStates();
-			System.out.println("3");
-			break;
-			
-		case 2:
-			System.out.println("2");
-			break;
-		}
-
 		int lastElem = path.size() - 1;
 
 		List<String> nextStates = new ArrayList<String>();
