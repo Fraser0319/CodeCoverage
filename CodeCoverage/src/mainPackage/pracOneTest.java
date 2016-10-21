@@ -40,8 +40,9 @@ public class pracOneTest {
 //        // System.out.println(p2.extendPath(path));
 //        // System.out.println(p2.breadthFirstSearch("MUIUUIU"));
 //        // System.out.println(p2.depthLimitedDFS("MUIUUIU",5));
-        p2.depthLimitedDFS("MII",10);
+        p2.iterativeDeepening("MUIUUIU");
         CodeTracker.getStatistics();
+        //System.out.println(CodeTracker.getCoverageRecord());
 //		System.out.println(CodeTracker.getCoverageRecord());
 	}
 

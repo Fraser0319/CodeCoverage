@@ -14,6 +14,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Scanner;
+
 import mainPackage.CodeTracker;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -40,35 +42,56 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 public class Parser {
+	
+	private static String fileName;
+
+	public String getFileName() {
+		return fileName;
+	}
 
 	public static void main(String[] args) throws Exception {
-		FileInputStream in = new FileInputStream("PracticalOne.java");
-		CompilationUnit cu;
-		Parser p = new Parser();
-		if (new File("codeTracker.ser").isFile()) {
-			List<Line> oldList = p.deserialise();
-			List<Line> updatedList = new ArrayList<>(oldList);
-			// removing old parsing for the input file in the list
-			for (Line l : oldList) {
-				if (l.getFileName().equals("PracticalOne")) {
-					updatedList.remove(l);
+
+		System.out.println("------ Code Parser ------");
+		System.out.println("Enter the path to your src folder you wish to parse: ");
+		Scanner scan = new Scanner(System.in);
+		String path = scan.nextLine();
+		File[] files = new File(path).listFiles();
+		
+
+		for (File f : files) {
+			fileName = f.getName();
+			System.out.println("Parsing: " + f.getName());
+
+			FileInputStream in = new FileInputStream(f);
+			CompilationUnit cu;
+			Parser p = new Parser();
+			if (new File("codeTracker.ser").isFile()) {
+				List<Line> oldList = p.deserialise();
+				List<Line> updatedList = new ArrayList<>(oldList);
+				// removing old parsing for the input file in the list
+				for (Line l : oldList) {
+					if (l.getFileName().equals(f.getName())) {
+						updatedList.remove(l);
+					}
+					CodeTracker.setCoverageRecord(updatedList);
 				}
-				CodeTracker.setCoverageRecord(updatedList);
 			}
-		}
 
-		try {
-			cu = JavaParser.parse(in);
-		} finally {
-			in.close();
-		}
+			try {
+				cu = JavaParser.parse(in);
+			} finally {
+				in.close();
+			}
 
-		new ModifierVisitor().visit(cu, null);
-		new ConstructorVisitor().visit(cu, null);
-		byte[] modfile = cu.toString().getBytes();
-		Path file = Paths.get("src/mainPackage/PracticalOne.java");
-		Files.write(file, modfile);
-		p.serialise();
+			new ModifierVisitor().visit(cu, null);
+			new ConstructorVisitor().visit(cu, null);
+			byte[] modfile = cu.toString().getBytes();
+			Path file = Paths.get("src/mainPackage/" + f.getName());
+			Files.write(file, modfile);
+			p.serialise();
+			System.out.println("------ Parsing "+ f.getName() + " Complete" + "------");
+			System.out.println();
+		}
 	}
 
 	public void serialise() {
@@ -104,7 +127,7 @@ public class Parser {
 	private static class ModifierVisitor extends VoidVisitorAdapter {
 
 		public void visit(MethodDeclaration n, Object a) {
-			//System.out.println(n.getChildrenNodes().get(3).getChildrenNodes());
+			// System.out.println(n.getChildrenNodes().get(3).getChildrenNodes());
 			n.setBody(modifyBlockStatement(n.getBody().getChildrenNodes()));
 		}
 
@@ -114,8 +137,8 @@ public class Parser {
 			BlockStmt newBlock = new BlockStmt();
 			List<? extends Node> newList = new ArrayList<>(n);
 			for (Node s : newList) {
-			
-				if(s.getClass().getSimpleName().equals("LineComment")){
+
+				if (s.getClass().getSimpleName().equals("LineComment")) {
 					break;
 				}
 				if (s.getClass().getSimpleName().equals("IfStmt")) {
@@ -143,12 +166,12 @@ public class Parser {
 					fes = modifyForEach(fes);
 					newBlock.addStatement(fes);
 					newBlock.addStatement(print(fes));
-				} else if(s.getClass().getSimpleName().equals("DoStmt")){
+				} else if (s.getClass().getSimpleName().equals("DoStmt")) {
 					DoStmt dos = (DoStmt) s;
 					dos = modifyDo(dos);
 					newBlock.addStatement(dos);
 					newBlock.addStatement(print(dos));
-				} else if (s.getClass().getSimpleName().equals("TryStmt")){
+				} else if (s.getClass().getSimpleName().equals("TryStmt")) {
 					TryStmt tryst = (TryStmt) s;
 					tryst = modifiedTry(tryst);
 					newBlock.addStatement(tryst);
@@ -182,12 +205,11 @@ public class Parser {
 
 		public ForStmt modifyForLoop(ForStmt forStatement) {
 			ForStmt modifiedForStatement = forStatement;
-			modifiedForStatement
-					.setBody(modifyBlockStatement(modifiedForStatement.getBody().getChildrenNodes()));
+			modifiedForStatement.setBody(modifyBlockStatement(modifiedForStatement.getBody().getChildrenNodes()));
 			return modifiedForStatement;
 		}
-		
-		public DoStmt modifyDo(DoStmt doStatement){
+
+		public DoStmt modifyDo(DoStmt doStatement) {
 			DoStmt modifiedDoStatement = doStatement;
 			modifiedDoStatement.setBody(modifyBlockStatement(modifiedDoStatement.getBody().getChildrenNodes()));
 			return modifiedDoStatement;
@@ -195,8 +217,7 @@ public class Parser {
 
 		public WhileStmt modifyWhile(WhileStmt whileStatement) {
 			WhileStmt modifiedWhileStatement = whileStatement;
-			modifiedWhileStatement
-					.setBody(modifyBlockStatement(modifiedWhileStatement.getBody().getChildrenNodes()));
+			modifiedWhileStatement.setBody(modifyBlockStatement(modifiedWhileStatement.getBody().getChildrenNodes()));
 			return modifiedWhileStatement;
 		}
 
@@ -206,13 +227,13 @@ public class Parser {
 					.setEntries(modifySwitchEntryStatement((modifiedSwitchStatement.getChildrenNodes())));
 			return modifiedSwitchStatement;
 		}
-		
-		public TryStmt modifiedTry(TryStmt tryStatement){
+
+		public TryStmt modifiedTry(TryStmt tryStatement) {
 			TryStmt modifiedTry = tryStatement;
 			modifiedTry.setTryBlock(modifyBlockStatement(modifiedTry.getTryBlock().getChildrenNodes()));
 			return modifiedTry;
 		}
-		
+
 		public List<SwitchEntryStmt> modifySwitchEntryStatement(List<Node> n) {
 			SwitchEntryStmt modifiedSwitchEntry = null;
 			List<SwitchEntryStmt> newEntryList = new ArrayList<>();
@@ -242,18 +263,18 @@ public class Parser {
 		public Statement print(Statement e) {
 
 			MethodCallExpr newCall = new MethodCallExpr(new NameExpr("mainPackage.CodeTracker"), "markExecuted");
-			newCall.addArgument(new StringLiteralExpr("PracticalOne"));
+			newCall.addArgument(new StringLiteralExpr(Parser.fileName));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
-			CodeTracker.addCode("PracticalOne", "" + e.getBegin().line);
+			CodeTracker.addCode(Parser.fileName, "" + e.getBegin().line);
 			return new ExpressionStmt(newCall);
 		}
 
 		public Statement print(Expression e) {
 
 			MethodCallExpr newCall = new MethodCallExpr(new NameExpr("mainPackage.CodeTracker"), "markExecuted");
-			newCall.addArgument(new StringLiteralExpr("PracticalOne"));
+			newCall.addArgument(new StringLiteralExpr(Parser.fileName));
 			newCall.addArgument(new StringLiteralExpr("" + e.getBegin().line));
-			CodeTracker.addCode("PracticalOne", "" + e.getBegin().line);
+			CodeTracker.addCode(Parser.fileName, "" + e.getBegin().line);
 			return new ExpressionStmt(newCall);
 		}
 	}
