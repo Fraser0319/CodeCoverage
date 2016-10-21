@@ -20,7 +20,7 @@ public class ConstructorVisitor extends VoidVisitorAdapter {
 			newBlock.addStatement(b);
 			newBlock.addStatement(print(b));
 		}
-		newBlock = block;
+		n.setBody(newBlock);
 	}
 	
 	

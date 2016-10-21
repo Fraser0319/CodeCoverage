@@ -27,12 +27,27 @@ public class PracticalOne {
 
 		String input;
 		input = s;
+		int x = 10;
 
+		do {
+			System.out.print("value of x : " + x);
+			x++;
+			System.out.print("\n");
+		} while (x < 20);
+		
+		
+		
 		// rule 1 - if it ends in an I
 		if (s.charAt(s.length() - 1) == 'I') {
 
 			nextStates.add(input += 'U');
 			input = s;
+		}
+		
+		try{
+			System.out.println("hi");
+		}catch(Exception e){
+			e.printStackTrace();
 		}
 		
 
