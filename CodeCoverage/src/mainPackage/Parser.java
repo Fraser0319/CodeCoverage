@@ -104,7 +104,8 @@ public class Parser {
 	private static class ModifierVisitor extends VoidVisitorAdapter {
 
 		public void visit(MethodDeclaration n, Object a) {
-			n.setBody(modifyBlockStatement(n.getChildrenNodes().get(3).getChildrenNodes()));
+			//System.out.println(n.getChildrenNodes().get(3).getChildrenNodes());
+			n.setBody(modifyBlockStatement(n.getBody().getChildrenNodes()));
 		}
 
 		// works with List<Node> also.
@@ -113,6 +114,10 @@ public class Parser {
 			BlockStmt newBlock = new BlockStmt();
 			List<? extends Node> newList = new ArrayList<>(n);
 			for (Node s : newList) {
+			
+				if(s.getClass().getSimpleName().equals("LineComment")){
+					break;
+				}
 				if (s.getClass().getSimpleName().equals("IfStmt")) {
 					IfStmt f = (IfStmt) s;
 					f = modifyIf(f);

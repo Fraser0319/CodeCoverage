@@ -27,12 +27,9 @@ public class PracticalOne {
         mainPackage.CodeTracker.markExecuted("PracticalOne", "30");
         int x = 10;
         do {
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "33");
-            System.out.print("value of x : " + x);
             mainPackage.CodeTracker.markExecuted("PracticalOne", "34");
+            //			System.out.print("value of x : " + x);
             x++;
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "35");
-            System.out.print("\n");
         } while (x < 20);
         mainPackage.CodeTracker.markExecuted("PracticalOne", "32");
         // rule 1 - if it ends in an I
@@ -43,13 +40,6 @@ public class PracticalOne {
             input = s;
         }
         mainPackage.CodeTracker.markExecuted("PracticalOne", "41");
-        try {
-            mainPackage.CodeTracker.markExecuted("PracticalOne", "48");
-            System.out.println("hi");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        mainPackage.CodeTracker.markExecuted("PracticalOne", "47");
         // rule 2 - if it starts with M
         if (s.charAt(0) == 'M') {
             mainPackage.CodeTracker.markExecuted("PracticalOne", "58");

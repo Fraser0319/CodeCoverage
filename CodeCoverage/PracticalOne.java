@@ -30,9 +30,9 @@ public class PracticalOne {
 		int x = 10;
 
 		do {
-			System.out.print("value of x : " + x);
+//			System.out.print("value of x : " + x);
 			x++;
-			System.out.print("\n");
+//			System.out.print("\n");
 		} while (x < 20);
 		
 		
@@ -44,11 +44,11 @@ public class PracticalOne {
 			input = s;
 		}
 		
-		try{
-			System.out.println("hi");
-		}catch(Exception e){
-			e.printStackTrace();
-		}
+//		try{
+////			System.out.println("hi");
+//		}catch(Exception e){
+//			e.printStackTrace();
+//		}
 		
 
 	
