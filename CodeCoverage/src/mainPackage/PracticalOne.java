@@ -8,8 +8,8 @@ public class PracticalOne {
     private List<String> nextStates;
 
     public PracticalOne() {
+        mainPackage.CodeTracker.markExecuted("PracticalOne.java", "14");
         nextStates = new ArrayList<String>();
-        mainPackage.CodeTracker.markExecuted("PracticalOne", "14");
     }
 
     public static void main(String[] args) {

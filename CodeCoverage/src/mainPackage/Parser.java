@@ -20,6 +20,7 @@ import mainPackage.CodeTracker;
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.Node;
+import com.github.javaparser.ast.body.ConstructorDeclaration;
 import com.github.javaparser.ast.body.MethodDeclaration;
 import com.github.javaparser.ast.expr.Expression;
 import com.github.javaparser.ast.expr.MethodCallExpr;
@@ -84,7 +85,7 @@ public class Parser {
 			}
 
 			new ModifierVisitor().visit(cu, null);
-			new ConstructorVisitor().visit(cu, null);
+			//new ConstructorVisitor().visit(cu, null);
 			byte[] modfile = cu.toString().getBytes();
 			Path file = Paths.get("src/mainPackage/" + f.getName());
 			Files.write(file, modfile);
@@ -125,6 +126,10 @@ public class Parser {
 	}
 
 	private static class ModifierVisitor extends VoidVisitorAdapter {
+		
+		public void visit(ConstructorDeclaration n, Object a){
+			n.setBody(modifyBlockStatement(n.getBody().getChildrenNodes()));
+		}
 
 		public void visit(MethodDeclaration n, Object a) {
 			// System.out.println(n.getChildrenNodes().get(3).getChildrenNodes());
