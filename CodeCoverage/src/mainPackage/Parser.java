@@ -43,7 +43,7 @@ import com.github.javaparser.ast.stmt.WhileStmt;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 public class Parser {
-	
+
 	private static String fileName;
 
 	public String getFileName() {
@@ -57,9 +57,11 @@ public class Parser {
 		Scanner scan = new Scanner(System.in);
 		String path = scan.nextLine();
 		File[] files = new File(path).listFiles();
-		
 
 		for (File f : files) {
+			if (f.getName().equals(".DS_Store")) {
+				continue;
+			}
 			fileName = f.getName();
 			System.out.println("Parsing: " + f.getName());
 
@@ -85,12 +87,12 @@ public class Parser {
 			}
 
 			new ModifierVisitor().visit(cu, null);
-			//new ConstructorVisitor().visit(cu, null);
+			// new ConstructorVisitor().visit(cu, null);
 			byte[] modfile = cu.toString().getBytes();
 			Path file = Paths.get("src/mainPackage/" + f.getName());
 			Files.write(file, modfile);
 			p.serialise();
-			System.out.println("------ Parsing "+ f.getName() + " Complete" + "------");
+			System.out.println("------ Parsing " + f.getName() + " Complete" + "------");
 			System.out.println();
 		}
 	}
@@ -126,13 +128,12 @@ public class Parser {
 	}
 
 	private static class ModifierVisitor extends VoidVisitorAdapter {
-		
-		public void visit(ConstructorDeclaration n, Object a){
+
+		public void visit(ConstructorDeclaration n, Object a) {
 			n.setBody(modifyBlockStatement(n.getBody().getChildrenNodes()));
 		}
 
 		public void visit(MethodDeclaration n, Object a) {
-			// System.out.println(n.getChildrenNodes().get(3).getChildrenNodes());
 			n.setBody(modifyBlockStatement(n.getBody().getChildrenNodes()));
 		}
 
@@ -142,7 +143,6 @@ public class Parser {
 			BlockStmt newBlock = new BlockStmt();
 			List<? extends Node> newList = new ArrayList<>(n);
 			for (Node s : newList) {
-
 				if (s.getClass().getSimpleName().equals("LineComment")) {
 					break;
 				}

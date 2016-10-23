@@ -9,14 +9,14 @@ import java.io.Serializable;
 public class Line implements Serializable {
 
 	private String fileName;
-	private String  lineNumber;
+	private String lineNumber;
 	private boolean lineExecuted;
 
 	public void setFileName(String fileName) {
 		this.fileName = fileName;
 	}
 
-	public void setLineNumber(String  lineNumber) {
+	public void setLineNumber(String lineNumber) {
 		this.lineNumber = lineNumber;
 	}
 
@@ -28,7 +28,7 @@ public class Line implements Serializable {
 		return fileName;
 	}
 
-	public String  getLineNumber() {
+	public String getLineNumber() {
 		return lineNumber;
 	}
 
